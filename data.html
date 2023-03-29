@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>JSON Data Display</title>
+  </head>
+  <body>
+    <h1>JSON Data Display</h1>
+    <div id="data-container"></div>
+
+    <script>  
+      function fetchData() {
+        // use JavaScript to retrieve the JSON data from the server
+      fetch("/raw/data")
+        .then(response => response.json())
+        .then(data => {
+          // create HTML elements to display the JSON data
+          const container = document.getElementById("data-container");
+          container.innerHTML = "";
+          
+          const title = document.createElement("h2");
+          title.innerText = "Data:";
+          container.appendChild(title);
+
+          const list = document.createElement("ul");
+          container.appendChild(list);
+
+          for (const [key, value] of Object.entries(data)) {
+            const item = document.createElement("li");
+            const label = document.createElement("span");
+            label.innerText = `${key}: `;
+            item.appendChild(label);
+
+            if (Array.isArray(value)) {
+              const subList = document.createElement("ul");
+              for (const item of value) {
+                const subItem = document.createElement("li");
+                subItem.innerText = item;
+                subList.appendChild(subItem);
+              }
+              item.appendChild(subList);
+            } else if (typeof value === "object") {
+              const subList = document.createElement("ul");
+              for (const [subKey, subValue] of Object.entries(value)) {
+                const subItem = document.createElement("li");
+                subItem.innerText = `${subKey}: ${subValue}`;
+                subList.appendChild(subItem);
+              }
+              item.appendChild(subList);
+            } else {
+              const valueElem = document.createElement("span");
+              valueElem.innerText = value;
+              item.appendChild(valueElem);
+            }
+
+            list.appendChild(item);
+          }
+        })
+        .catch(error => console.error(error));
+      }
+
+      fetchData();
+
+      setInterval(fetchData, 1000);
+    </script>
+  </body>
+</html>
